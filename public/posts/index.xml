@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Posts on robin3z</title>
+    <link>http://robin3z.github.io/posts/</link>
+    <description>Recent content in Posts on robin3z</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>© Copyright robin3z</copyright>
+    <lastBuildDate>Thu, 08 Sep 2022 11:26:00 +0830</lastBuildDate><atom:link href="http://robin3z.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Spring Boot 线程池的配置及使用场景</title>
+      <link>http://robin3z.github.io/2022/09/spring-boot-thread-pool-configuration-and-basic-usage/</link>
+      <pubDate>Thu, 08 Sep 2022 11:26:00 +0830</pubDate>
+      
+      <guid>http://robin3z.github.io/2022/09/spring-boot-thread-pool-configuration-and-basic-usage/</guid>
+      <description>Spring Boot 的线程池是在自动配置类 “org.springframework.boot.autoconfigure.task.TaskExecutionAutoConfiguration” 中完成配置。 默认配置的线程池是 “org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor”。 这是自动完成的， 除非通过以下2中方式中的一种禁用 TaskExecutionAutoConfiguration 自动配置。
+ 在应用的配置文件中添加如下配置项  spring.autoconfigure.exclude=org.springframework.boot.autoconfigure.task.TaskExecutionAutoConfiguration
+ 在启动类中添加如下代码  @SpringBootApplication(exclude={org.springframework.boot.autoconfigure.task.TaskExecutionAutoConfiguration.class})
+即使不使用线程池，其实也没必要去禁用 TaskExecutionAutoConfiguration 自动配置， “如何禁用”有时在调试时可以用到, 知道就好了。
+ 1. 使用线程池首先需要做的事情就是在启动类添加 @EnableAsync 注解 比如以下是我常用的启动类配置
+@EnableAsync @SpringBootApplication public class Application extends SpringBootServletInitializer { public static void main(String[] args) { SpringApplication.run(Application.class, args); } @Override protected SpringApplicationBuilder configure(SpringApplicationBuilder builder) { return builder.sources(Application.class); } } 2. 在需要异步执行的bean对象方法上添加 @Async 注解。 添加了 @Async 后， 就可以通过打印线程id或者设置断点的方式， 测试一下方法是否按预期那样在线程池中执行了。
+因为 @Async 是通过动态代理技术实现的， 所以 @Async 不能加在静态方法上， 并且同一个类的不同方法间通过this相互调用是不会生效的。 这跟使用 @Transactional 注解开启事务时需要注意的事项是相同的。</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,89 @@
+baseURL = "http://robin3z.github.io/"
+languageCode = "en-us"
+title = "robin3z"
+theme = "ink-free"
+paginate = 5
+
+copyright = "© Copyright robin3z"
+# Demo only
+#ignoreErrors = ["error-missing-instagram-accesstoken"]
+ignoreErrors = ["error-remote-getjson"]
+timeout = 16
+
+[permalinks]
+  posts = "/:year/:month/:slug"
+
+[params]
+	subtitle = "学好用好 Java、Linux C/C++、PHP、Nginx、Redis、MySQL."
+
+	# Optional 64x64 avatar image.
+	#avatar = "https://image.freepik.com/free-vector/young-man-head-with-beard-avatar-character_24877-36786.jpg"
+
+	featherIconsCDN = false
+
+	# Enable a table of contents
+	toc = true
+
+	# Max tags
+  	maxTags = 7
+
+  # Define words per minute to approximate reading time
+  wpm = 250
+
+	footers = [
+	]
+
+	# Github base url
+  	github = "https://github.com/robin3z"
+
+
+# Nav.
+[[menu.main]]
+name = "主页"
+url = "/"
+weight = 1
+
+[[menu.main]]
+name = "文章"
+url = "/posts/"
+weight = 2
+
+[[menu.main]]
+name = "关于"
+url = "/#about"
+weight = 4
+
+[[menu.main]]
+name = "标签"
+url = "/tags/"
+weight = 3
+
+[[params.social]]
+name = "Github"
+icon = "github"
+url = "https://github.com/robin3z"
+
+[[params.social]]
+name = "RSS"
+icon = "rss"
+url = "/index.xml"
+
+[taxonomies]
+   tag = "tags"
+
+[markup]
+  [markup.highlight]
+    codeFences = true
+    guessSyntax = false
+    hl_Lines = ""
+    lineNoStart = 1
+    lineNos = true
+    lineNumbersInTable = true
+    noClasses = true
+    style = "github"
+    tabWidth = 4
+
+  [markup.tableOfContents]
+    endLevel = 3
+    ordered = true
+    startLevel = 2 

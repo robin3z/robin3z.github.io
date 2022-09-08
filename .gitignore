@@ -1,0 +1,16 @@
+*~
+*.swp
+*.pyc
+.svn
+*.zip
+*.gz
+*.log
+*.jar
+*.iml
+*.log
+.project
+.classpath
+.gradle
+.idea
+.nb-gradle
+.vscode

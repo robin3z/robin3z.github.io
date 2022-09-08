@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<!-- <html {{- if (eq .Site.Params.mode "dark") -}}class="dark"{{ end }}> -->
+{{ partial "header.html" . }}
+<body>
+	<div class="container wrapper">
+		{{ partial "head.html" . }}
+
+		<div class="recent-posts section">
+			<div class="posts">
+				{{ $pages := where .Site.RegularPages "Type" "in" .Site.Params.mainSections }}
+				{{ $paginator := .Paginate (where $pages "Params.hidden" "ne" true) }}
+				{{ range $paginator.Pages }}
+					<div class="post">
+						<div class="post-header">
+							<div class="meta">
+								<div class="date">
+									<span class="day">{{ dateFormat "02" .Date }}</span>
+							<span class="rest">{{ if $.Site.Data.month }}{{ index $.Site.Data.month (printf "%d" .Date.Month) }} {{ .Date.Year }}{{ else }}{{ dateFormat "Jan 2006" .Date }}{{ end }}</span>
+								</div>
+							</div>
+							<div class="matter">
+								<h4 class="title small">
+									<a href="{{ .RelPermalink }}">{{.Title}}{{ if .Draft }}<sup class="draft-label">DRAFT</sup>{{ end }}</a>
+								</h4>
+								<h4 class="title small smaller">
+									{{ .WordCount  | lang.FormatNumberCustom 0 }} words, ~{{ div .WordCount .Site.Params.wpm }} min read 
+								</h4>
+								<h4 class="title small smaller">
+									{{ if gt .Params.tags 0 }}
+										<ul class="tags flat">
+											{{ range first .Site.Params.maxTags .Params.tags }}
+											<li class="tag-li"><a href="{{ "/tags/" | relLangURL }}{{ . | urlize }}">{{ . }}</a></li>
+											{{ end }}
+										</ul>
+									{{ end }}
+								</h4>
+								<span class="description">
+									{{ if isset .Params "description" }}
+										{{ .Description }}
+									{{ else if gt (len .RawContent) 120 }}
+										{{ slicestr .RawContent 0 120 }}...
+									{{ else }}
+										{{ .RawContent }}
+									{{ end }}
+								</span>
+							</div>
+						</div>
+					</div>
+				{{ end }}
+				{{ template "partials/paginator.html" . }}
+			</div>
+
+            <div id="about" class="prose">
+              <h1>关于我</h1>
+              <p>2022年，因前公司倒闭而失业的大龄程序员。如果您能提供工作机会或者有合作项目需要开发人员，可通过微信联系我。</p>
+              <ul>
+                <li><a href="https://robin3z.github.io/index.xml">RSS订阅本博客</a></li>
+                <li><a href="https://github.com/robin3z">Github</a></li>
+                <li>微信</li>
+              </ul>
+              <p><img src="/img/vx.jpg" height="342"></p>
+            </div>
+
+		</div>
+	</div>
+	{{ partial "footer.html" . }}
+</body>
+</html>
