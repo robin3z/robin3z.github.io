@@ -3,18 +3,24 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>http://robin3z.github.io/tags/java/</loc>
-    <lastmod>2022-09-08T11:26:00+08:30</lastmod>
+    <lastmod>2022-09-10T02:01:27+00:00</lastmod>
   </url><url>
     <loc>http://robin3z.github.io/posts/</loc>
-    <lastmod>2022-09-08T11:26:00+08:30</lastmod>
+    <lastmod>2022-09-10T02:01:27+00:00</lastmod>
   </url><url>
     <loc>http://robin3z.github.io/</loc>
-    <lastmod>2022-09-08T11:26:00+08:30</lastmod>
-  </url><url>
-    <loc>http://robin3z.github.io/2022/09/spring-boot-thread-pool-configuration-and-basic-usage/</loc>
-    <lastmod>2022-09-08T11:26:00+08:30</lastmod>
+    <lastmod>2022-09-10T02:01:27+00:00</lastmod>
   </url><url>
     <loc>http://robin3z.github.io/tags/</loc>
+    <lastmod>2022-09-10T02:01:27+00:00</lastmod>
+  </url><url>
+    <loc>http://robin3z.github.io/tags/xxl-job/</loc>
+    <lastmod>2022-09-10T02:01:27+00:00</lastmod>
+  </url><url>
+    <loc>http://robin3z.github.io/2022/09/xxl-job-terminate-task/</loc>
+    <lastmod>2022-09-10T02:01:27+00:00</lastmod>
+  </url><url>
+    <loc>http://robin3z.github.io/2022/09/spring-boot-thread-pool-configuration-and-basic-usage/</loc>
     <lastmod>2022-09-08T11:26:00+08:30</lastmod>
   </url><url>
     <loc>http://robin3z.github.io/about/</loc>

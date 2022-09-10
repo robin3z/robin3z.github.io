@@ -7,7 +7,20 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>© Copyright robin3z</copyright>
-    <lastBuildDate>Thu, 08 Sep 2022 11:26:00 +0830</lastBuildDate><atom:link href="http://robin3z.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sat, 10 Sep 2022 02:01:27 +0000</lastBuildDate><atom:link href="http://robin3z.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>xxl-job 手动终止任务时需要注意的事项</title>
+      <link>http://robin3z.github.io/2022/09/xxl-job-terminate-task/</link>
+      <pubDate>Sat, 10 Sep 2022 02:01:27 +0000</pubDate>
+      
+      <guid>http://robin3z.github.io/2022/09/xxl-job-terminate-task/</guid>
+      <description>xxl-job 是较知名的开源 Java 任务调度系统， 昨天试了试， 非常易用。 只在手动终止任务时遇到了一些非自己预期的小问题。
+BEAN 类型任务的手动终止问题 xxl-job 的任务是在 JobThread 中执行， 手动终止时是通过调用 Thread 类的 interrupt 方法来实现。 如果此时线程刚好阻塞在一些可打断的方法调用上，比如 Thread.sleep(), 那么 sleep 会被打断并立即抛出 InterruptedException 异常。 如果这个异常未作捕获处理，那么线程就结束运行了，刚好达到了手动终止任务的目的。 实际应用中，任务程序长时间未结束，不一定是阻塞了，而是确实一次要处理的业务太多。 这时会出现无法手动终止任务的情况。
+知道了 xxl-job 手动终止任务的原理后， 解决上述问题就容易了。
+ 我们知道，Thread.interrupt() 只是对线程对象设置了一下打断标记， 可以通过 Thread.currentThread().isInterrupted() 来获取这个打断标记。 如果 isInterrupted() 返回值为 true, 那么说明 xxl-job 任务被手动终止， 我们在业务代码中就可以立即返回而不是继续执行：  if (Thread.currentThread().isInterrupted()){ return; } 如果业务代码埋得较深，可以考虑通过抛 RuntimeException 异常的形式来终止线程执行：
+if (Thread.currentThread().isInterrupted()){ throw new RuntimeException(&amp;quot;interrupted&amp;quot;); }  线程的打断标记在未被清除之前是一直有效的， 所以即使线程打断发生在前，业务代码里 Thread.sleep() 调用在后，此时的 sleep 方法调用会立即抛出 InterruptedException 异常， 而不会实际进入睡眠。  所以业务代码里在合适的地方调用一次 Thread.</description>
+    </item>
+    
     <item>
       <title>Spring Boot 线程池的配置及使用场景</title>
       <link>http://robin3z.github.io/2022/09/spring-boot-thread-pool-configuration-and-basic-usage/</link>

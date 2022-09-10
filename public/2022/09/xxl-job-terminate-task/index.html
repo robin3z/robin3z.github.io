@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge"><title>xxl-job 手动终止任务时需要注意的事项 - robin3z</title><meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta itemprop="name" content="xxl-job 手动终止任务时需要注意的事项">
+<meta itemprop="description" content="xxl-job 是较知名的开源 Java 任务调度系统， 昨天试了试， 非常易用。 只在手动终止任务时遇到了一些非自己预期的小问题。
+BEAN 类型任务的手动终止问题 xxl-job 的任务是在 JobThread 中执行， 手动终止时是通过调用 Thread 类的 interrupt 方法来实现。 如果此时线程刚好阻塞在一些可打断的方法调用上，比如 Thread.sleep(), 那么 sleep 会被打断并立即抛出 InterruptedException 异常。 如果这个异常未作捕获处理，那么线程就结束运行了，刚好达到了手动终止任务的目的。 实际应用中，任务程序长时间未结束，不一定是阻塞了，而是确实一次要处理的业务太多。 这时会出现无法手动终止任务的情况。
+知道了 xxl-job 手动终止任务的原理后， 解决上述问题就容易了。
+ 我们知道，Thread.interrupt() 只是对线程对象设置了一下打断标记， 可以通过 Thread.currentThread().isInterrupted() 来获取这个打断标记。 如果 isInterrupted() 返回值为 true, 那么说明 xxl-job 任务被手动终止， 我们在业务代码中就可以立即返回而不是继续执行：  if (Thread.currentThread().isInterrupted()){ return; } 如果业务代码埋得较深，可以考虑通过抛 RuntimeException 异常的形式来终止线程执行：
+if (Thread.currentThread().isInterrupted()){ throw new RuntimeException(&quot;interrupted&quot;); }  线程的打断标记在未被清除之前是一直有效的， 所以即使线程打断发生在前，业务代码里 Thread.sleep() 调用在后，此时的 sleep 方法调用会立即抛出 InterruptedException 异常， 而不会实际进入睡眠。  所以业务代码里在合适的地方调用一次 Thread."><meta itemprop="datePublished" content="2022-09-10T02:01:27+00:00" />
+<meta itemprop="dateModified" content="2022-09-10T02:01:27+00:00" />
+<meta itemprop="wordCount" content="178">
+<meta itemprop="keywords" content="Java,xxl-job," /><meta property="og:title" content="xxl-job 手动终止任务时需要注意的事项" />
+<meta property="og:description" content="xxl-job 是较知名的开源 Java 任务调度系统， 昨天试了试， 非常易用。 只在手动终止任务时遇到了一些非自己预期的小问题。
+BEAN 类型任务的手动终止问题 xxl-job 的任务是在 JobThread 中执行， 手动终止时是通过调用 Thread 类的 interrupt 方法来实现。 如果此时线程刚好阻塞在一些可打断的方法调用上，比如 Thread.sleep(), 那么 sleep 会被打断并立即抛出 InterruptedException 异常。 如果这个异常未作捕获处理，那么线程就结束运行了，刚好达到了手动终止任务的目的。 实际应用中，任务程序长时间未结束，不一定是阻塞了，而是确实一次要处理的业务太多。 这时会出现无法手动终止任务的情况。
+知道了 xxl-job 手动终止任务的原理后， 解决上述问题就容易了。
+ 我们知道，Thread.interrupt() 只是对线程对象设置了一下打断标记， 可以通过 Thread.currentThread().isInterrupted() 来获取这个打断标记。 如果 isInterrupted() 返回值为 true, 那么说明 xxl-job 任务被手动终止， 我们在业务代码中就可以立即返回而不是继续执行：  if (Thread.currentThread().isInterrupted()){ return; } 如果业务代码埋得较深，可以考虑通过抛 RuntimeException 异常的形式来终止线程执行：
+if (Thread.currentThread().isInterrupted()){ throw new RuntimeException(&quot;interrupted&quot;); }  线程的打断标记在未被清除之前是一直有效的， 所以即使线程打断发生在前，业务代码里 Thread.sleep() 调用在后，此时的 sleep 方法调用会立即抛出 InterruptedException 异常， 而不会实际进入睡眠。  所以业务代码里在合适的地方调用一次 Thread." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://robin3z.github.io/2022/09/xxl-job-terminate-task/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2022-09-10T02:01:27+00:00" />
+<meta property="article:modified_time" content="2022-09-10T02:01:27+00:00" />
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="xxl-job 手动终止任务时需要注意的事项"/>
+<meta name="twitter:description" content="xxl-job 是较知名的开源 Java 任务调度系统， 昨天试了试， 非常易用。 只在手动终止任务时遇到了一些非自己预期的小问题。
+BEAN 类型任务的手动终止问题 xxl-job 的任务是在 JobThread 中执行， 手动终止时是通过调用 Thread 类的 interrupt 方法来实现。 如果此时线程刚好阻塞在一些可打断的方法调用上，比如 Thread.sleep(), 那么 sleep 会被打断并立即抛出 InterruptedException 异常。 如果这个异常未作捕获处理，那么线程就结束运行了，刚好达到了手动终止任务的目的。 实际应用中，任务程序长时间未结束，不一定是阻塞了，而是确实一次要处理的业务太多。 这时会出现无法手动终止任务的情况。
+知道了 xxl-job 手动终止任务的原理后， 解决上述问题就容易了。
+ 我们知道，Thread.interrupt() 只是对线程对象设置了一下打断标记， 可以通过 Thread.currentThread().isInterrupted() 来获取这个打断标记。 如果 isInterrupted() 返回值为 true, 那么说明 xxl-job 任务被手动终止， 我们在业务代码中就可以立即返回而不是继续执行：  if (Thread.currentThread().isInterrupted()){ return; } 如果业务代码埋得较深，可以考虑通过抛 RuntimeException 异常的形式来终止线程执行：
+if (Thread.currentThread().isInterrupted()){ throw new RuntimeException(&quot;interrupted&quot;); }  线程的打断标记在未被清除之前是一直有效的， 所以即使线程打断发生在前，业务代码里 Thread.sleep() 调用在后，此时的 sleep 方法调用会立即抛出 InterruptedException 异常， 而不会实际进入睡眠。  所以业务代码里在合适的地方调用一次 Thread."/>
+<link rel="stylesheet" type="text/css" media="screen" href="http://robin3z.github.io/css/normalize.css" />
+	<link rel="stylesheet" type="text/css" media="screen" href="http://robin3z.github.io/css/main.css" />
+
+        <link id="dark-scheme" rel="stylesheet" type="text/css" href="http://robin3z.github.io/css/dark.css" />
+
+	<script src="http://robin3z.github.io/js/feather.min.js"></script>
+	
+		<script src="http://robin3z.github.io/js/main.js"></script>
+</head>
+
+<body>
+	<div class="container wrapper">
+		<div class="header">
+	
+	<h1 class="site-title"><a href="http://robin3z.github.io/">robin3z</a></h1>
+	<div class="site-description"><p>学好用好 Java、Linux C/C++、PHP、Nginx、Redis、MySQL.</p><nav class="nav social">
+			<ul class="flat"><li><a href="https://github.com/robin3z" title="Github"><i data-feather="github"></i></a></li><li><a href="/index.xml" title="RSS"><i data-feather="rss"></i></a></li></ul>
+		</nav>
+		
+	</div>
+
+	<nav class="nav">
+		<ul class="flat">
+			
+			<li>
+				<a href="/">主页</a>
+			</li>
+			
+			<li>
+				<a href="/posts/">文章</a>
+			</li>
+			
+			<li>
+				<a href="/tags/">标签</a>
+			</li>
+			
+			<li>
+				<a href="/#about">关于</a>
+			</li>
+			
+		</ul>
+	</nav>
+</div>
+
+
+		<div class="post">
+			<div class="post-header">
+				
+					<div class="meta">
+						<div class="date">
+							<span class="day">10</span>
+							<span class="rest">九月 2022</span>
+						</div>
+					</div>
+				
+				<div class="matter">
+					<h1 class="title">xxl-job 手动终止任务时需要注意的事项</h1>
+				</div>
+			</div>
+
+			<div class="tags">
+				
+					
+						<ul class="flat">
+							
+							<li class="tag-li"><a href="/tags/java">Java</a></li>
+							
+							<li class="tag-li"><a href="/tags/xxl-job">xxl-job</a></li>
+							
+						</ul>
+					
+				
+			</div>
+			
+			
+					
+			<div class="markdown">
+				<p>xxl-job 是较知名的开源 Java 任务调度系统， 昨天试了试， 非常易用。 只在手动终止任务时遇到了一些非自己预期的小问题。</p>
+<h2 id="bean-类型任务的手动终止问题">BEAN 类型任务的手动终止问题</h2>
+<p>xxl-job 的任务是在 JobThread 中执行， 手动终止时是通过调用 Thread 类的 interrupt 方法来实现。 如果此时线程刚好阻塞在一些可打断的方法调用上，比如 Thread.sleep(), 那么 sleep 会被打断并立即抛出 InterruptedException 异常。 如果这个异常未作捕获处理，那么线程就结束运行了，刚好达到了手动终止任务的目的。 实际应用中，任务程序长时间未结束，不一定是阻塞了，而是确实一次要处理的业务太多。 这时会出现无法手动终止任务的情况。</p>
+<p>知道了 xxl-job 手动终止任务的原理后， 解决上述问题就容易了。</p>
+<ul>
+<li>我们知道，Thread.interrupt() 只是对线程对象设置了一下打断标记， 可以通过 Thread.currentThread().isInterrupted() 来获取这个打断标记。 如果 isInterrupted() 返回值为 true, 那么说明 xxl-job 任务被手动终止， 我们在业务代码中就可以立即返回而不是继续执行：</li>
+</ul>
+<pre tabindex="0"><code>if (Thread.currentThread().isInterrupted()){
+    return;
+}
+</code></pre><p>如果业务代码埋得较深，可以考虑通过抛 RuntimeException 异常的形式来终止线程执行：</p>
+<pre tabindex="0"><code>if (Thread.currentThread().isInterrupted()){
+    throw new RuntimeException(&quot;interrupted&quot;);
+}
+</code></pre><ul>
+<li>线程的打断标记在未被清除之前是一直有效的， 所以即使线程打断发生在前，业务代码里 Thread.sleep() 调用在后，此时的 sleep 方法调用会立即抛出 InterruptedException 异常， 而不会实际进入睡眠。</li>
+</ul>
+<p>所以业务代码里在合适的地方调用一次 Thread.sleep(1)，也就是睡眠1毫秒，那么也是可以达到终止业务线程执行的效果。</p>
+<p>个人不推荐使用这种方法，因为代码可阅读性差一些，并且有些业务方法可能不允许抛异常。 应该优先考虑前面提到方法，也就是通过 isInterrupted() 来判断线程是否被打断来终止任务。</p>
+<h2 id="脚本任务的手动终止问题">脚本任务的手动终止问题</h2>
+<p>xxl-job 支持脚本类型的任务， 比如 shell, php, python 等，任务线程会通过 fork 出新进程的形式来执行脚本。 在手动停止任务时， xxl-job 只是停止了自己的 JobThread 线程， 不会终止脚本进程的执行。 在使用 xxl-job 脚本任务时， 如果后台发现脚本任务长时间未结束，这时需要登录到执行器的服务器上，自己检查脚本进程的运行情况，并手动 kill 掉脚本进程。</p>
+<ul>
+<li>通过 jps 或者 ps 命令找到执行器的 Java 进程 ID</li>
+</ul>
+<pre tabindex="0"><code># jps
+22434 Jps
+21798 xxl-job-executor-sample-springboot-2.3.1.jar
+</code></pre><ul>
+<li>然后通过 pstree 名称查看 Java 进程 fork 出了哪些脚本进程：</li>
+</ul>
+<pre tabindex="0"><code># pstree -p 21798
+java(21798)─┬─bash(22239)───sleep(22242)
+            ├─{java}(21799)
+            ├─{java}(21800)
+            ├─{java}(21801)
+</code></pre><p>比如上面的例子中， Java 进程先 fork 出了 bash 进程 22239, 然后 bash 进程 fork 出了 sleep 进程 22242 。</p>
+<p>然后可以用 ps 命令查看一下 进程 22239 详细情况:</p>
+<pre tabindex="0"><code>ps -ef|grep 22239
+root      22239  21798  bash /data/applogs/xxl-job/jobhandler/gluesource/2_1662777364000.sh
+root      22242  22239  sleep 120
+</code></pre><p>从上面的输出结果中， 可以看到 shell 脚本的存放位置， 以及其子进程 sleep 是睡眠 120 秒。</p>
+<p>最后就可以通过 kill 命令来杀死这些进程了， 一般需要先杀死进程树中处于末端的进程， 比如这样 <code># kill 22242  22239</code>。</p>
+
+			</div>
+			
+			<div class="back">
+				<a href="http://robin3z.github.io/"><span aria-hidden="true">← Back</span></a>
+			</div></div>
+		
+	</div>
+	
+	<div class="footer wrapper">
+	<nav class="nav">
+		<div>2022  © Copyright robin3z </div>
+	</nav>
+</div><script>feather.replace()</script>
+</body>
+</html>

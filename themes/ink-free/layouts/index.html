@@ -23,9 +23,6 @@
 									<a href="{{ .RelPermalink }}">{{.Title}}{{ if .Draft }}<sup class="draft-label">DRAFT</sup>{{ end }}</a>
 								</h4>
 								<h4 class="title small smaller">
-									{{ .WordCount  | lang.FormatNumberCustom 0 }} words, ~{{ div .WordCount .Site.Params.wpm }} min read 
-								</h4>
-								<h4 class="title small smaller">
 									{{ if gt .Params.tags 0 }}
 										<ul class="tags flat">
 											{{ range first .Site.Params.maxTags .Params.tags }}
@@ -52,7 +49,7 @@
 
             <div id="about" class="prose">
               <h1>关于我</h1>
-              <p>2022年，因前公司倒闭而失业的大龄程序员。如果您能提供工作机会或者有合作项目需要开发人员，可通过微信联系我。</p>
+              <p>大龄失业程序员，如果你有项目需要开发人员，可通过微信联系我。</p>
               <ul>
                 <li><a href="https://robin3z.github.io/index.xml">RSS订阅本博客</a></li>
                 <li><a href="https://github.com/robin3z">Github</a></li>
