@@ -7,13 +7,22 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>© Copyright robin3z</copyright>
-    <lastBuildDate>Sat, 10 Sep 2022 02:01:27 +0000</lastBuildDate><atom:link href="http://robin3z.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 15 Sep 2022 12:42:02 +0000</lastBuildDate><atom:link href="http://robin3z.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Java</title>
       <link>http://robin3z.github.io/tags/java/</link>
-      <pubDate>Sat, 10 Sep 2022 02:01:27 +0000</pubDate>
+      <pubDate>Thu, 15 Sep 2022 12:42:02 +0000</pubDate>
       
       <guid>http://robin3z.github.io/tags/java/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Nacos</title>
+      <link>http://robin3z.github.io/tags/nacos/</link>
+      <pubDate>Thu, 15 Sep 2022 12:42:02 +0000</pubDate>
+      
+      <guid>http://robin3z.github.io/tags/nacos/</guid>
       <description></description>
     </item>
     
