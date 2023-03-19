@@ -7,7 +7,21 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>© Copyright robin3z</copyright>
-    <lastBuildDate>Thu, 15 Sep 2022 12:42:02 +0000</lastBuildDate><atom:link href="http://robin3z.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 19 Mar 2023 07:20:35 +0000</lastBuildDate><atom:link href="http://robin3z.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>记录Nginx慢请求到单独日志文件</title>
+      <link>http://robin3z.github.io/2023/03/nginx-slow-request-log/</link>
+      <pubDate>Sun, 19 Mar 2023 07:20:35 +0000</pubDate>
+      
+      <guid>http://robin3z.github.io/2023/03/nginx-slow-request-log/</guid>
+      <description>Nginx 记录响应时间的变量 Nginx 本身有相关变量(request_time, upstream_response_time)用来记录响应时间， 为了做性能分析，需要记录这些值到access log里。 Nginx 作为反向代理服务器，实际是将请求转发给具体的上游应用服务器，所以upstream_response_time的价值更大一些，需要重点关注。
+单独的慢请求日志文件 如果响应时间数据混在普通的access log日志文件里， 那么后续做性能分析时会非常不方便。 Nginx 1.7.0 版本的access_log指令新增了一个if参数，使得我们有能力根据条件判断是否记录日志。
+access_log指令的语法格式：
+access_log path [format [buffer=size] [gzip[=level]] [flush=time] [if=condition]]; 只有当if参数中的 condition 变量的值不为0或空时，Nginx才会记录日志。
+我们可以使用 Map 指令生成一个新变量is_slow_request， 比如只有当变量 upstream_response_time 的值大于等于2秒时，变量 is_slow_request 的值才设置为1， 然后将 is_slow_request 传给 access_log 的 if 参数， 这样就实现了将慢请求记录到单独日志文件的功能。 以下是一个具体的 Nginx 配置例子。
+http { log_format slow &amp;#39;&amp;#34;$request&amp;#34; &amp;#39; &amp;#39;$status $request_length:$bytes_sent:$body_bytes_sent $upstream_response_time&amp;#39;; map $upstream_response_time $is_slow_request { ~^[23456789] 1; #响应时间大于等于2秒则为慢请求 default 0; } server { location / { proxy_pass http://127.</description>
+    </item>
+    
     <item>
       <title>微服务利器之Nacos</title>
       <link>http://robin3z.github.io/2022/09/spring-boot-nacos-integration/</link>
@@ -17,10 +31,10 @@
       <description>阿里巴巴开源的 Nacos 同时拥有配置管理和服务管理的功能。 写个帖子，记录一下近几天学习 nacos 的收获。
 Srping Boot、Spring Cloud、Nacos 之间的版本兼容问题 发现用较新的 Spring Boot、Spring Cloud 版本玩不转 Nacos 后，于是开始了寻找兼容版本之旅。
 Nacos 官方有这么一行说明:
- 注意：版本 0.2.x.RELEASE 对应的是 Spring Boot 2.x 版本， 版本 0.1.x.RELEASE 对应的是 Spring Boot 1.x 版本。
- 从 maven 中央仓库查到 spring-cloud-alibaba 的最新版本是 2.2.8.RELEASE，根据上面的那行 Nacos 官网“注意”说明， 莫不是 Spring Boot 得用 2.x 才能兼容当前版本？
+注意：版本 0.2.x.RELEASE 对应的是 Spring Boot 2.x 版本， 版本 0.1.x.RELEASE 对应的是 Spring Boot 1.x 版本。
+从 maven 中央仓库查到 spring-cloud-alibaba 的最新版本是 2.2.8.RELEASE，根据上面的那行 Nacos 官网“注意”说明， 莫不是 Spring Boot 得用 2.x 才能兼容当前版本？
 最后版本选择如下：
- Nacos Server 2.1.1 Spring Boot 2.2.9.RELEASE Spring Cloud Hoxton.SR10 Spring Cloud Alibaba 2.2.8.RELEASE  实现动态切换 MySQL 数据源 在 Nacos 后台改了配置后， Nacos 会主动推送给应用。 Spring 应用只要对依赖于 Nacos 配置的 Bean 都加上 Spring Cloud 注解 @RefreshScope， 就能做到自动刷新配置了。 实际上，加了 @RefreshScope 的 Bean 会先销毁，然后重新创建。然而，使用了 Spring Boot 官方的自动数据源配置（DataSourceAutoConfiguration），是不会加 @RefreshScope 的。 只能自己配置数据源了，比如，可以按如下配置 HikariDataSource 数据源:</description>
+Nacos Server 2.1.1 Spring Boot 2.2.9.RELEASE Spring Cloud Hoxton.SR10 Spring Cloud Alibaba 2.2.8.RELEASE 实现动态切换 MySQL 数据源 在 Nacos 后台改了配置后， Nacos 会主动推送给应用。 Spring 应用只要对依赖于 Nacos 配置的 Bean 都加上 Spring Cloud 注解 @RefreshScope， 就能做到自动刷新配置了。 实际上，加了 @RefreshScope 的 Bean 会先销毁，然后重新创建。然而，使用了 Spring Boot 官方的自动数据源配置（DataSourceAutoConfiguration），是不会加 @RefreshScope 的。 只能自己配置数据源了，比如，可以按如下配置 HikariDataSource 数据源:</description>
     </item>
     
     <item>
@@ -32,8 +46,9 @@ Nacos 官方有这么一行说明:
       <description>xxl-job 是较知名的开源 Java 任务调度系统， 昨天试了试， 非常易用。 只在手动终止任务时遇到了一些非自己预期的小问题。
 BEAN 类型任务的手动终止问题 xxl-job 的任务是在 JobThread 中执行， 手动终止时是通过调用 Thread 类的 interrupt 方法来实现。 如果此时线程刚好阻塞在一些可打断的方法调用上，比如 Thread.sleep(), 那么 sleep 会被打断并立即抛出 InterruptedException 异常。 如果这个异常未作捕获处理，那么线程就结束运行了，刚好达到了手动终止任务的目的。 实际应用中，任务程序长时间未结束，不一定是阻塞了，而是确实一次要处理的业务太多。 这时会出现无法手动终止任务的情况。
 知道了 xxl-job 手动终止任务的原理后， 解决上述问题就容易了。
- 我们知道，Thread.interrupt() 只是对线程对象设置了一下打断标记， 可以通过 Thread.currentThread().isInterrupted() 来获取这个打断标记。 如果 isInterrupted() 返回值为 true, 那么说明 xxl-job 任务被手动终止， 我们在业务代码中就可以立即返回而不是继续执行：  if (Thread.currentThread().isInterrupted()){ return; } 如果业务代码埋得较深，可以考虑通过抛 RuntimeException 异常的形式来终止线程执行：
-if (Thread.currentThread().isInterrupted()){ throw new RuntimeException(&amp;quot;interrupted&amp;quot;); }  线程的打断标记在未被清除之前是一直有效的， 所以即使线程打断发生在前，业务代码里 Thread.sleep() 调用在后，此时的 sleep 方法调用会立即抛出 InterruptedException 异常， 而不会实际进入睡眠。  所以业务代码里在合适的地方调用一次 Thread.</description>
+我们知道，Thread.interrupt() 只是对线程对象设置了一下打断标记， 可以通过 Thread.currentThread().isInterrupted() 来获取这个打断标记。 如果 isInterrupted() 返回值为 true, 那么说明 xxl-job 任务被手动终止， 我们在业务代码中就可以立即返回而不是继续执行： if (Thread.currentThread().isInterrupted()){ return; } 如果业务代码埋得较深，可以考虑通过抛 RuntimeException 异常的形式来终止线程执行：
+if (Thread.currentThread().isInterrupted()){ throw new RuntimeException(&amp;#34;interrupted&amp;#34;); } 线程的打断标记在未被清除之前是一直有效的， 所以即使线程打断发生在前，业务代码里 Thread.sleep() 调用在后，此时的 sleep 方法调用会立即抛出 InterruptedException 异常， 而不会实际进入睡眠。 所以业务代码里在合适的地方调用一次 Thread.sleep(1)，也就是睡眠1毫秒，那么也是可以达到终止业务线程执行的效果。
+个人不推荐使用这种方法，因为代码可阅读性差一些，并且有些业务方法可能不允许抛异常。 应该优先考虑前面提到方法，也就是通过 isInterrupted() 来判断线程是否被打断来终止任务。</description>
     </item>
     
     <item>
@@ -43,10 +58,10 @@ if (Thread.currentThread().isInterrupted()){ throw new RuntimeException(&amp;quo
       
       <guid>http://robin3z.github.io/2022/09/spring-boot-thread-pool-configuration-and-basic-usage/</guid>
       <description>Spring Boot 的线程池是在自动配置类 “org.springframework.boot.autoconfigure.task.TaskExecutionAutoConfiguration” 中完成配置。 默认配置的线程池是 “org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor”。 这是自动完成的， 除非通过以下2中方式中的一种禁用 TaskExecutionAutoConfiguration 自动配置。
- 在应用的配置文件中添加如下配置项  spring.autoconfigure.exclude=org.springframework.boot.autoconfigure.task.TaskExecutionAutoConfiguration
- 在启动类中添加如下代码  @SpringBootApplication(exclude={org.springframework.boot.autoconfigure.task.TaskExecutionAutoConfiguration.class})
+在应用的配置文件中添加如下配置项 spring.autoconfigure.exclude=org.springframework.boot.autoconfigure.task.TaskExecutionAutoConfiguration
+在启动类中添加如下代码 @SpringBootApplication(exclude={org.springframework.boot.autoconfigure.task.TaskExecutionAutoConfiguration.class})
 即使不使用线程池，其实也没必要去禁用 TaskExecutionAutoConfiguration 自动配置， “如何禁用”有时在调试时可以用到, 知道就好了。
- 1. 使用线程池首先需要做的事情就是在启动类添加 @EnableAsync 注解 比如以下是我常用的启动类配置
+1. 使用线程池首先需要做的事情就是在启动类添加 @EnableAsync 注解 比如以下是我常用的启动类配置
 @EnableAsync @SpringBootApplication public class Application extends SpringBootServletInitializer { public static void main(String[] args) { SpringApplication.run(Application.class, args); } @Override protected SpringApplicationBuilder configure(SpringApplicationBuilder builder) { return builder.sources(Application.class); } } 2. 在需要异步执行的bean对象方法上添加 @Async 注解。 添加了 @Async 后， 就可以通过打印线程id或者设置断点的方式， 测试一下方法是否按预期那样在线程池中执行了。
 因为 @Async 是通过动态代理技术实现的， 所以 @Async 不能加在静态方法上， 并且同一个类的不同方法间通过this相互调用是不会生效的。 这跟使用 @Transactional 注解开启事务时需要注意的事项是相同的。</description>
     </item>

@@ -14,7 +14,7 @@ timeout = 16
   posts = "/:year/:month/:slug"
 
 [params]
-	subtitle = "学好用好 Java、Linux C/C++、PHP、Nginx、Redis、MySQL."
+	subtitle = "新目标：多读一点、多写一点。"
 
 	# Optional 64x64 avatar image.
 	#avatar = "https://image.freepik.com/free-vector/young-man-head-with-beard-avatar-character_24877-36786.jpg"

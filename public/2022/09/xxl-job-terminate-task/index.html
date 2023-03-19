@@ -7,16 +7,18 @@
 <meta itemprop="description" content="xxl-job 是较知名的开源 Java 任务调度系统， 昨天试了试， 非常易用。 只在手动终止任务时遇到了一些非自己预期的小问题。
 BEAN 类型任务的手动终止问题 xxl-job 的任务是在 JobThread 中执行， 手动终止时是通过调用 Thread 类的 interrupt 方法来实现。 如果此时线程刚好阻塞在一些可打断的方法调用上，比如 Thread.sleep(), 那么 sleep 会被打断并立即抛出 InterruptedException 异常。 如果这个异常未作捕获处理，那么线程就结束运行了，刚好达到了手动终止任务的目的。 实际应用中，任务程序长时间未结束，不一定是阻塞了，而是确实一次要处理的业务太多。 这时会出现无法手动终止任务的情况。
 知道了 xxl-job 手动终止任务的原理后， 解决上述问题就容易了。
- 我们知道，Thread.interrupt() 只是对线程对象设置了一下打断标记， 可以通过 Thread.currentThread().isInterrupted() 来获取这个打断标记。 如果 isInterrupted() 返回值为 true, 那么说明 xxl-job 任务被手动终止， 我们在业务代码中就可以立即返回而不是继续执行：  if (Thread.currentThread().isInterrupted()){ return; } 如果业务代码埋得较深，可以考虑通过抛 RuntimeException 异常的形式来终止线程执行：
-if (Thread.currentThread().isInterrupted()){ throw new RuntimeException(&quot;interrupted&quot;); }  线程的打断标记在未被清除之前是一直有效的， 所以即使线程打断发生在前，业务代码里 Thread.sleep() 调用在后，此时的 sleep 方法调用会立即抛出 InterruptedException 异常， 而不会实际进入睡眠。  所以业务代码里在合适的地方调用一次 Thread."><meta itemprop="datePublished" content="2022-09-10T02:01:27+00:00" />
+我们知道，Thread.interrupt() 只是对线程对象设置了一下打断标记， 可以通过 Thread.currentThread().isInterrupted() 来获取这个打断标记。 如果 isInterrupted() 返回值为 true, 那么说明 xxl-job 任务被手动终止， 我们在业务代码中就可以立即返回而不是继续执行： if (Thread.currentThread().isInterrupted()){ return; } 如果业务代码埋得较深，可以考虑通过抛 RuntimeException 异常的形式来终止线程执行：
+if (Thread.currentThread().isInterrupted()){ throw new RuntimeException(&#34;interrupted&#34;); } 线程的打断标记在未被清除之前是一直有效的， 所以即使线程打断发生在前，业务代码里 Thread.sleep() 调用在后，此时的 sleep 方法调用会立即抛出 InterruptedException 异常， 而不会实际进入睡眠。 所以业务代码里在合适的地方调用一次 Thread.sleep(1)，也就是睡眠1毫秒，那么也是可以达到终止业务线程执行的效果。
+个人不推荐使用这种方法，因为代码可阅读性差一些，并且有些业务方法可能不允许抛异常。 应该优先考虑前面提到方法，也就是通过 isInterrupted() 来判断线程是否被打断来终止任务。"><meta itemprop="datePublished" content="2022-09-10T02:01:27+00:00" />
 <meta itemprop="dateModified" content="2022-09-10T02:01:27+00:00" />
 <meta itemprop="wordCount" content="178">
 <meta itemprop="keywords" content="Java,xxl-job," /><meta property="og:title" content="xxl-job 手动终止任务时需要注意的事项" />
 <meta property="og:description" content="xxl-job 是较知名的开源 Java 任务调度系统， 昨天试了试， 非常易用。 只在手动终止任务时遇到了一些非自己预期的小问题。
 BEAN 类型任务的手动终止问题 xxl-job 的任务是在 JobThread 中执行， 手动终止时是通过调用 Thread 类的 interrupt 方法来实现。 如果此时线程刚好阻塞在一些可打断的方法调用上，比如 Thread.sleep(), 那么 sleep 会被打断并立即抛出 InterruptedException 异常。 如果这个异常未作捕获处理，那么线程就结束运行了，刚好达到了手动终止任务的目的。 实际应用中，任务程序长时间未结束，不一定是阻塞了，而是确实一次要处理的业务太多。 这时会出现无法手动终止任务的情况。
 知道了 xxl-job 手动终止任务的原理后， 解决上述问题就容易了。
- 我们知道，Thread.interrupt() 只是对线程对象设置了一下打断标记， 可以通过 Thread.currentThread().isInterrupted() 来获取这个打断标记。 如果 isInterrupted() 返回值为 true, 那么说明 xxl-job 任务被手动终止， 我们在业务代码中就可以立即返回而不是继续执行：  if (Thread.currentThread().isInterrupted()){ return; } 如果业务代码埋得较深，可以考虑通过抛 RuntimeException 异常的形式来终止线程执行：
-if (Thread.currentThread().isInterrupted()){ throw new RuntimeException(&quot;interrupted&quot;); }  线程的打断标记在未被清除之前是一直有效的， 所以即使线程打断发生在前，业务代码里 Thread.sleep() 调用在后，此时的 sleep 方法调用会立即抛出 InterruptedException 异常， 而不会实际进入睡眠。  所以业务代码里在合适的地方调用一次 Thread." />
+我们知道，Thread.interrupt() 只是对线程对象设置了一下打断标记， 可以通过 Thread.currentThread().isInterrupted() 来获取这个打断标记。 如果 isInterrupted() 返回值为 true, 那么说明 xxl-job 任务被手动终止， 我们在业务代码中就可以立即返回而不是继续执行： if (Thread.currentThread().isInterrupted()){ return; } 如果业务代码埋得较深，可以考虑通过抛 RuntimeException 异常的形式来终止线程执行：
+if (Thread.currentThread().isInterrupted()){ throw new RuntimeException(&#34;interrupted&#34;); } 线程的打断标记在未被清除之前是一直有效的， 所以即使线程打断发生在前，业务代码里 Thread.sleep() 调用在后，此时的 sleep 方法调用会立即抛出 InterruptedException 异常， 而不会实际进入睡眠。 所以业务代码里在合适的地方调用一次 Thread.sleep(1)，也就是睡眠1毫秒，那么也是可以达到终止业务线程执行的效果。
+个人不推荐使用这种方法，因为代码可阅读性差一些，并且有些业务方法可能不允许抛异常。 应该优先考虑前面提到方法，也就是通过 isInterrupted() 来判断线程是否被打断来终止任务。" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="http://robin3z.github.io/2022/09/xxl-job-terminate-task/" /><meta property="article:section" content="posts" />
 <meta property="article:published_time" content="2022-09-10T02:01:27+00:00" />
@@ -27,8 +29,9 @@ if (Thread.currentThread().isInterrupted()){ throw new RuntimeException(&quot;in
 <meta name="twitter:description" content="xxl-job 是较知名的开源 Java 任务调度系统， 昨天试了试， 非常易用。 只在手动终止任务时遇到了一些非自己预期的小问题。
 BEAN 类型任务的手动终止问题 xxl-job 的任务是在 JobThread 中执行， 手动终止时是通过调用 Thread 类的 interrupt 方法来实现。 如果此时线程刚好阻塞在一些可打断的方法调用上，比如 Thread.sleep(), 那么 sleep 会被打断并立即抛出 InterruptedException 异常。 如果这个异常未作捕获处理，那么线程就结束运行了，刚好达到了手动终止任务的目的。 实际应用中，任务程序长时间未结束，不一定是阻塞了，而是确实一次要处理的业务太多。 这时会出现无法手动终止任务的情况。
 知道了 xxl-job 手动终止任务的原理后， 解决上述问题就容易了。
- 我们知道，Thread.interrupt() 只是对线程对象设置了一下打断标记， 可以通过 Thread.currentThread().isInterrupted() 来获取这个打断标记。 如果 isInterrupted() 返回值为 true, 那么说明 xxl-job 任务被手动终止， 我们在业务代码中就可以立即返回而不是继续执行：  if (Thread.currentThread().isInterrupted()){ return; } 如果业务代码埋得较深，可以考虑通过抛 RuntimeException 异常的形式来终止线程执行：
-if (Thread.currentThread().isInterrupted()){ throw new RuntimeException(&quot;interrupted&quot;); }  线程的打断标记在未被清除之前是一直有效的， 所以即使线程打断发生在前，业务代码里 Thread.sleep() 调用在后，此时的 sleep 方法调用会立即抛出 InterruptedException 异常， 而不会实际进入睡眠。  所以业务代码里在合适的地方调用一次 Thread."/>
+我们知道，Thread.interrupt() 只是对线程对象设置了一下打断标记， 可以通过 Thread.currentThread().isInterrupted() 来获取这个打断标记。 如果 isInterrupted() 返回值为 true, 那么说明 xxl-job 任务被手动终止， 我们在业务代码中就可以立即返回而不是继续执行： if (Thread.currentThread().isInterrupted()){ return; } 如果业务代码埋得较深，可以考虑通过抛 RuntimeException 异常的形式来终止线程执行：
+if (Thread.currentThread().isInterrupted()){ throw new RuntimeException(&#34;interrupted&#34;); } 线程的打断标记在未被清除之前是一直有效的， 所以即使线程打断发生在前，业务代码里 Thread.sleep() 调用在后，此时的 sleep 方法调用会立即抛出 InterruptedException 异常， 而不会实际进入睡眠。 所以业务代码里在合适的地方调用一次 Thread.sleep(1)，也就是睡眠1毫秒，那么也是可以达到终止业务线程执行的效果。
+个人不推荐使用这种方法，因为代码可阅读性差一些，并且有些业务方法可能不允许抛异常。 应该优先考虑前面提到方法，也就是通过 isInterrupted() 来判断线程是否被打断来终止任务。"/>
 <link rel="stylesheet" type="text/css" media="screen" href="http://robin3z.github.io/css/normalize.css" />
 	<link rel="stylesheet" type="text/css" media="screen" href="http://robin3z.github.io/css/main.css" />
 
@@ -44,7 +47,7 @@ if (Thread.currentThread().isInterrupted()){ throw new RuntimeException(&quot;in
 		<div class="header">
 	
 	<h1 class="site-title"><a href="http://robin3z.github.io/">robin3z</a></h1>
-	<div class="site-description"><p>学好用好 Java、Linux C/C++、PHP、Nginx、Redis、MySQL.</p><nav class="nav social">
+	<div class="site-description"><p>新目标：多读一点、多写一点。</p><nav class="nav social">
 			<ul class="flat"><li><a href="https://github.com/robin3z" title="Github"><i data-feather="github"></i></a></li><li><a href="/index.xml" title="RSS"><i data-feather="rss"></i></a></li></ul>
 		</nav>
 		
@@ -118,7 +121,7 @@ if (Thread.currentThread().isInterrupted()){ throw new RuntimeException(&quot;in
 }
 </code></pre><p>如果业务代码埋得较深，可以考虑通过抛 RuntimeException 异常的形式来终止线程执行：</p>
 <pre tabindex="0"><code>if (Thread.currentThread().isInterrupted()){
-    throw new RuntimeException(&quot;interrupted&quot;);
+    throw new RuntimeException(&#34;interrupted&#34;);
 }
 </code></pre><ul>
 <li>线程的打断标记在未被清除之前是一直有效的， 所以即使线程打断发生在前，业务代码里 Thread.sleep() 调用在后，此时的 sleep 方法调用会立即抛出 InterruptedException 异常， 而不会实际进入睡眠。</li>
